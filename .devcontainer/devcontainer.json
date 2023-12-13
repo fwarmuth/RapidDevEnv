@@ -1,0 +1,20 @@
+// .devcontainer/devcontainer.json
+
+{
+    "name": "My Docker Development Environment",
+    // Build image
+    "build": {
+      "dockerfile": "Dockerfile",
+      "args": {
+        "USERNAME": "vscode",
+        "USER_UID": "1000",
+        "USER_GID": "1000"
+      }
+    },
+    "remoteUser": "vscode",
+    "runArgs": [
+        "--hostname=devcontainer",
+      // Add any additional run arguments here
+    ],
+  }
+  
