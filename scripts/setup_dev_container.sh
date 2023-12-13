@@ -3,13 +3,6 @@
 # Get the path of the script
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-# Delete the .git folder if it exists
-if [ -d "$SCRIPT_PATH/../.git" ]; then
-    #    rm -rf "$SCRIPT_PATH/../.git"
-    echo "Deleted .git folder"
-else
-    echo "No .git folder found"
-fi
 
 # Get the path of the devcontainer.json
 DEVCON_FILE="$SCRIPT_PATH/../.devcontainer/devcontainer.json"
@@ -34,7 +27,23 @@ sed -i "s/\"USER_GID\": \".*\"/\"USER_GID\": \"$new_user_gid\"/" "$DEVCON_FILE"
 # Change --hostname to the hostname of the machine
 # Read the container name from the devcontainer.json
 container_name="$(cat $DEVCON_FILE | sed 's/^ *\/\/.*//' | jq -r '.name')"
+# Set the .build.args.PROJECT_NAME to the container name
+sed -i "s/\"PROJECT_NAME\": \".*\"/\"PROJECT_NAME\": \"$container_name\"/" "$DEVCON_FILE"
 # Get the hostname
 hostname="$container_name@$(hostname)"
 # Use sed to replace the values
 sed -i "s/\"--hostname=.*\"/\"--hostname=$hostname\"/" "$DEVCON_FILE"
+
+# Ask the user if .git folder should be deleted
+read -p "Do you want to delete the .git folder? (y/n) " -n 1 -r
+echo # Move to a new line
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    # Delete the .git folder if it exists
+    if [ -d "$SCRIPT_PATH/../.git" ]; then
+        # rm -rf "$SCRIPT_PATH/../.git"
+        echo "Deleted .git folder"
+    else
+        echo "No .git folder found"
+    fi
+fi

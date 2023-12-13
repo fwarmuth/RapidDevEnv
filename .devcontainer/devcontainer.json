@@ -7,12 +7,13 @@
       "args": {
         "USERNAME": "vscode",
         "USER_UID": "1000",
-        "USER_GID": "1000"
+        "USER_GID": "1000",
+        "PROJECT_NAME": "RapidDevEnv"
       }
     },
     "remoteUser": "vscode",
     "runArgs": [
-        "--hostname=devcontainer"
+        "--hostname=RapidDevEnv@host"
       // Add any additional run arguments here
     ]
 }
