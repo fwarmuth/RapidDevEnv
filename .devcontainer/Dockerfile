@@ -6,11 +6,6 @@ ARG USERNAME=$USERNAME
 ARG USER_UID=$USER_UID
 ARG USER_GID=$USER_GID
 
-# Print build arguments
-RUN echo "USERNAME: $USERNAME"
-RUN echo "USER_UID: $USER_UID"
-RUN echo "USER_GID: $USER_GID"
-
 # Set non-interactive mode during build
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -53,3 +48,5 @@ RUN sh -c "echo 'autoload -U compinit && compinit' >> ~/.zshrc"
 RUN sh -c ". /etc/environment && git clone --depth=1 https://github.com/junegunn/fzf.git ~/.fzf"
 RUN sh -c ". /etc/environment && ~/.fzf/install"
 
+# Remove the non-interactive mode
+ARG DEBIAN_FRONTEND=
