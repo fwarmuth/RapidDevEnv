@@ -1,7 +1,6 @@
 // .devcontainer/devcontainer.json
-
 {
-    "name": "My Docker Development Environment",
+    "name": "RapidDevEnv",
     // Build image
     "build": {
       "dockerfile": "Dockerfile",
@@ -13,8 +12,8 @@
     },
     "remoteUser": "vscode",
     "runArgs": [
-        "--hostname=devcontainer",
+        "--hostname=devcontainer"
       // Add any additional run arguments here
-    ],
-  }
+    ]
+}
   
