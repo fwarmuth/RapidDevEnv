@@ -1,12 +1,11 @@
-#!/usr/bin/env python3
+#!/bin/env python3
 import os
 import json
-import subprocess
 import click
 import re
 
 @click.command()
-@click.option('--name', help='Specify the name of the container')
+@click.option('--name', '-n', help='Specify the name of the container')
 def main(name):
     # Get the path of the script
     script_path = os.path.realpath(__file__)

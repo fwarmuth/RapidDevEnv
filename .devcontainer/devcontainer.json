@@ -1,17 +1,16 @@
 {
-    "name": "RapidDevEnv",
-    "build": {
-      "dockerfile": "Dockerfile",
-      "args": {
-        "USERNAME": "vscode",
-        "USER_UID": "1000",
-        "USER_GID": "1000",
-        "PROJECT_NAME": "RapidDevEnv"
-      }
-    },
-    "remoteUser": "vscode",
-    "runArgs": [
-        "--hostname=RapidDevEnv@host"
-    ]
+  "name": "RapidDevEnv",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "USERNAME": "vscode",
+      "USER_UID": "1000",
+      "USER_GID": "1000",
+      "PROJECT_NAME": "RapidDevEnv"
+    }
+  },
+  "remoteUser": "vscode",
+  "runArgs": [
+    "--hostname=RapidDevEnv@host"
+  ],
 }
-  
