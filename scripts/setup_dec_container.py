@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
 import os
 import json
 import subprocess
 import click
+import re
 
 @click.command()
 @click.option('--name', help='Specify the name of the container')
@@ -10,18 +12,24 @@ def main(name):
     script_path = os.path.realpath(__file__)
 
     # Get the path of the devcontainer.json
-    devcon_file = os.path.join(os.path.dirname(script_path), '..', '.devcontainer', 'devcontainer.json')
+    devcon_file = os.path.join(os.path.dirname(os.path.dirname(script_path)), '.devcontainer', 'devcontainer.json')
 
     if name:
-        # Read devcontainer.json
-        with open(devcon_file, 'r') as f:
-            devcontainer_data = json.load(f)
-        # Change container name
-        devcontainer_data['name'] = name
-        # Write back to devcontainer.json
-        with open(devcon_file, 'w') as f:
-            json.dump(devcontainer_data, f, indent=2)
-        click.echo(f"Changed container name to {name}")
+        try:
+            # Read devcontainer.json
+            with open(devcon_file, 'r') as f:
+                # Remove Comments
+                f = re.sub(r'//.*', '', f.read())
+                devcontainer_data = json.loads(f) 
+            # Change container name
+            devcontainer_data['name'] = name
+            # Write back to devcontainer.json
+            with open(devcon_file, 'w') as f:
+                json.dump(devcontainer_data, f, indent=2)
+            click.echo(f"Changed container name to {name}")
+        except FileNotFoundError:
+            click.echo("devcontainer.json not found, not changing container name.")
+            exit(1)
     else:
         click.echo("No container name passed, not changing container name.")
 
