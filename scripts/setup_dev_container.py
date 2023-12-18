@@ -19,6 +19,10 @@ def main(name):
             with open(devcon_file, 'r') as f:
                 # Remove Comments
                 f = re.sub(r'//.*', '', f.read())
+                # Remove newlines
+                f = re.sub(r'\n', '', f)
+                # Remove trailing commas
+                f = re.sub(r',\s*}', '}', f)
                 devcontainer_data = json.loads(f) 
             # Change container name
             devcontainer_data['name'] = name
@@ -38,10 +42,20 @@ def main(name):
     update_json_values(devcon_file, 'build.args.USER_UID', new_user_uid)
     update_json_values(devcon_file, 'build.args.USER_GID', new_user_gid)
 
-    # Change --hostname to the hostname of the machine
+    # Change the project name
     container_name = read_json_value(devcon_file, 'name')
-    project_name = f"{container_name}@{os.uname().nodename}"
+    project_name = f"{container_name}"
     update_json_values(devcon_file, 'build.args.PROJECT_NAME', project_name)
+
+    # Change the hostname of the container
+    run_args = read_json_value(devcon_file, 'runArgs')
+    # Find the hostname argument and change it
+    for arg in run_args:
+        if arg.startswith('--hostname'):
+            run_args.remove(arg)
+            run_args.append(f"--hostname={project_name}@{os.uname().nodename}")
+            break
+    devcontainer_data['runArgs'] = run_args
 
     # Ask the user if .git folder should be deleted
     reply = click.prompt("Do you want to delete the .git folder? (y/n)", default='n')
@@ -57,7 +71,15 @@ def main(name):
 def update_json_values(file_path, key, value):
     with open(file_path, 'r') as f:
         devcontainer_data = json.load(f)
-    devcontainer_data[key] = value
+    # If key has a dot, split it and update the value
+    keys = key.split('.')
+    nested_dict = devcontainer_data
+
+    for k in keys[:-1]:
+        nested_dict = nested_dict.setdefault(k, {})
+
+    nested_dict[keys[-1]] = value
+
     with open(file_path, 'w') as f:
         json.dump(devcontainer_data, f, indent=2)
 
