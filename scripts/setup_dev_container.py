@@ -35,13 +35,13 @@ def main(name):
     # Set the values for USER_UID and USER_GID
     new_user_uid = str(os.getuid())
     new_user_gid = str(os.getgid())
-    update_json_values(devcon_file, 'USER_UID', new_user_uid)
-    update_json_values(devcon_file, 'USER_GID', new_user_gid)
+    update_json_values(devcon_file, 'build.args.USER_UID', new_user_uid)
+    update_json_values(devcon_file, 'build.args.USER_GID', new_user_gid)
 
     # Change --hostname to the hostname of the machine
     container_name = read_json_value(devcon_file, 'name')
     project_name = f"{container_name}@{os.uname().nodename}"
-    update_json_values(devcon_file, 'PROJECT_NAME', project_name)
+    update_json_values(devcon_file, 'build.args.PROJECT_NAME', project_name)
 
     # Ask the user if .git folder should be deleted
     reply = click.prompt("Do you want to delete the .git folder? (y/n)", default='n')
