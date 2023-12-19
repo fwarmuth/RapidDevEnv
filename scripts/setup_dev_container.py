@@ -5,8 +5,12 @@ import click
 import re
 
 @click.command()
-@click.option('--name', '-n', help='Specify the name of the container')
+@click.argument('name', required=True)
 def main(name):
+    # Rename root folder to the name of the project
+    root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    os.rename(root_folder, os.path.join(os.path.dirname(root_folder), name))
+
     # Get the path of the script
     script_path = os.path.realpath(__file__)
 
@@ -55,7 +59,12 @@ def main(name):
             run_args.remove(arg)
             run_args.append(f"--hostname={project_name}@{os.uname().nodename}")
             break
+    # Update the runArgs
     devcontainer_data['runArgs'] = run_args
+
+    # Write back to devcontainer.json
+    with open(devcon_file, 'w') as f:
+        json.dump(devcontainer_data, f, indent=2)
 
     # Ask the user if .git folder should be deleted
     reply = click.prompt("Do you want to delete the .git folder? (y/n)", default='n')
