@@ -28,10 +28,8 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo "$USERNAME ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Set the non-root user as the default user
-USER $USERNAME
-
 # Install oh-my-zsh
+USER $USERNAME
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended
 # Set the default shell to zsh
 RUN sudo chsh -s $(which zsh) $USERNAME
@@ -49,18 +47,49 @@ RUN sh -c "echo 'autoload -U compinit && compinit' >> ~/.zshrc"
 RUN sh -c ". /etc/environment && git clone --depth=1 https://github.com/junegunn/fzf.git ~/.fzf"
 RUN sh -c ". /etc/environment && ~/.fzf/install"
 
+# Setup additional SSH server for x11 forwarding,
+# Needs to be started manually, `sudo service ssh start`
+USER root
+# Install sshd server
+RUN apt-get update && sudo apt-get install -y openssh-server
+# Set port to 10000 + UID
+RUN sed -i "s/#Port 22/Port $((10000 + $USER_UID))/g" /etc/ssh/sshd_config 
+# Set user password to user
+RUN echo "$USERNAME:$USERNAME" | chpasswd
+
+# Install Python and Pypoetry
+USER root
+RUN apt-get update && \
+    apt-get install -y \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+RUN curl -sSL https://install.python-poetry.org | python3 -
+# Add poetry to PATH for non-root user
+USER $USERNAME
+RUN echo 'export PATH="/opt/pypoetry/bin:$PATH"' >> ~/.zshrc
+
 # Remove the non-interactive mode
 ARG DEBIAN_FRONTEND=
 
-
 FROM base as cuda
-# Install CUDA Toolkit 12.1.1
+# Install CUDA Toolkit stuff
+ARG DISTRO=ubuntu2204
+ARG ARCH=x86_64
 RUN sudo apt-get update && \
     sudo apt-get install -y \
         gnupg \
         wget \
         && \
     sudo rm -rf /var/lib/apt/lists/*
-
-# Create a txt file in home directory
-RUN touch ~/cuda_ubuntu2204.txt
+# Install NVIDIA Repo
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/$DISTRO/$ARCH/cuda-keyring_1.1-1_all.deb \
+    && dpkg -i cuda-keyring_1.1-1_all.deb \
+    && rm cuda-keyring_1.1-1_all.deb
+# Set the CUDA version as a build argument with a default value
+ARG CUDA_VERSION=12.1
+# Install CUDA stuff
+RUN apt-get update && \
+    apt-get install -y \
+    cuda-nvcc-$CUDA_VERSION \
+    && rm -rf /var/lib/apt/lists/*
