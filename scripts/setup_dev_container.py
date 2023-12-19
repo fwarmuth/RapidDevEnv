@@ -13,28 +13,23 @@ def main(name):
     # Get the path of the devcontainer.json
     devcon_file = os.path.join(os.path.dirname(os.path.dirname(script_path)), '.devcontainer', 'devcontainer.json')
 
-    if name:
-        try:
-            # Read devcontainer.json
-            with open(devcon_file, 'r') as f:
-                # Remove Comments
-                f = re.sub(r'//.*', '', f.read())
-                # Remove newlines
-                f = re.sub(r'\n', '', f)
-                # Remove trailing commas
-                f = re.sub(r',\s*}', '}', f)
-                devcontainer_data = json.loads(f) 
-            # Change container name
-            devcontainer_data['name'] = name
-            # Write back to devcontainer.json
-            with open(devcon_file, 'w') as f:
-                json.dump(devcontainer_data, f, indent=2)
-            click.echo(f"Changed container name to {name}")
-        except FileNotFoundError:
-            click.echo("devcontainer.json not found, not changing container name.")
-            exit(1)
-    else:
-        click.echo("No container name passed, not changing container name.")
+    try:
+        # Read devcontainer.json
+        with open(devcon_file, 'r') as f:
+            # Remove Comments
+            f = re.sub(r'//.*', '', f.read())
+            # Remove newlines
+            f = re.sub(r'\n', '', f)
+            # Remove trailing commas
+            f = re.sub(r',\s*}', '}', f)
+            devcontainer_data = json.loads(f) 
+        # Write back to devcontainer.json
+        with open(devcon_file, 'w') as f:
+            json.dump(devcontainer_data, f, indent=2)
+        click.echo(f"Changed container name to {name}")
+    except FileNotFoundError:
+        click.echo("devcontainer.json not found, not changing container name.")
+        exit(1)
 
     # Set the values for USER_UID and USER_GID
     new_user_uid = str(os.getuid())
@@ -42,10 +37,11 @@ def main(name):
     update_json_values(devcon_file, 'build.args.USER_UID', new_user_uid)
     update_json_values(devcon_file, 'build.args.USER_GID', new_user_gid)
 
+    # Change the container name
+    update_json_values(devcon_file, 'name', f"{name}-container")
+
     # Change the project name
-    container_name = read_json_value(devcon_file, 'name')
-    project_name = f"{container_name}"
-    update_json_values(devcon_file, 'build.args.PROJECT_NAME', project_name)
+    update_json_values(devcon_file, 'build.args.PROJECT_NAME', name)
 
     # Change the hostname of the container
     run_args = read_json_value(devcon_file, 'runArgs')
@@ -53,7 +49,7 @@ def main(name):
     for arg in run_args:
         if arg.startswith('--hostname'):
             run_args.remove(arg)
-            run_args.append(f"--hostname={project_name}@{os.uname().nodename}")
+            run_args.append(f"--hostname={read_json_value(devcon_file, 'name')}@{os.uname().nodename}")
             break
     # Update the runArgs
     devcontainer_data['runArgs'] = run_args
