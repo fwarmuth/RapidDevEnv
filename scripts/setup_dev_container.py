@@ -7,10 +7,6 @@ import re
 @click.command()
 @click.argument('name', required=True)
 def main(name):
-    # Rename root folder to the name of the project
-    root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    os.rename(root_folder, os.path.join(os.path.dirname(root_folder), name))
-
     # Get the path of the script
     script_path = os.path.realpath(__file__)
 
@@ -76,6 +72,11 @@ def main(name):
             click.echo("Deleted .git folder")
         else:
             click.echo("No .git folder found")
+
+    # Rename root folder to the name of the project, needed so that the history path within the dockerfile is correct
+    root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    os.rename(root_folder, os.path.join(os.path.dirname(root_folder), name))
+
 
 def update_json_values(file_path, key, value):
     with open(file_path, 'r') as f:
