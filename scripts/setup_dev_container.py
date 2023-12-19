@@ -5,7 +5,7 @@ import click
 import re
 
 @click.command()
-@click.argument('name', required=True)
+@click.argument('name', required=False, default=os.path.basename(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
 def main(name):
     # Get the path of the script
     script_path = os.path.realpath(__file__)
