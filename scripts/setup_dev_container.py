@@ -43,7 +43,7 @@ def main(name):
     # Change the project name
     update_json_values(devcon_file, 'build.args.PROJECT_NAME', name)
 
-    # Change the hostname of the container
+    # Change the hostname argument in the runArgs
     run_args = read_json_value(devcon_file, 'runArgs')
     # Find the hostname argument and change it
     for arg in run_args:
@@ -52,11 +52,7 @@ def main(name):
             run_args.append(f"--hostname={read_json_value(devcon_file, 'name')}@{os.uname().nodename}")
             break
     # Update the runArgs
-    devcontainer_data['runArgs'] = run_args
-
-    # Write back to devcontainer.json
-    with open(devcon_file, 'w') as f:
-        json.dump(devcontainer_data, f, indent=2)
+    update_json_values(devcon_file, 'runArgs', run_args)
 
     # Ask the user if .git folder should be deleted
     reply = click.prompt("Do you want to delete the .git folder? (y/n)", default='n')
