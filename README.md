@@ -9,22 +9,25 @@ Out-of-the-Box Configuration: Instantly deploy a development environment with a 
 - `fd-find`
 - `ripgrep`
 
-
 # Usage
 ## 1. Clone the repository
 ```bash
-git clone
+git clone https://github.com/fwarmuth/RapidDevEnv.git <ProjectName>
 ```
 ## 2. Setup the container generation
 ```
 # Change directory to the repository
-cd RapidDevEnv
-# Install python dependencies
+cd <ProjectName>
+# Install python dependencies for the setup script
 pip3 install -r scripts/requirements.txt
 # Run the setup script
-./scripts/setup_dev_container.py <ProjectName>
+./scripts/setup_dev_container.py
 ```
-This modifies the `devcontainer.json` file to use the project name as the container name and sets the user within the container to the current user 
+This modifies:
+- `devcontainer.json` file to use the project name as the container name
+- sets the user within the container to the user running the 
+- and more
+
 ## 3. Open the folder in VSCode
 ```
 code .
