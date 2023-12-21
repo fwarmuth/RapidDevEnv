@@ -34,7 +34,7 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 # Set the default shell to zsh
 RUN sudo chsh -s $(which zsh) $USERNAME
 # Activate oh-my-zsh plugins
-RUN sed -i 's/plugins=(git)/plugins=(git per-directory-history z)/g' ~/.zshrc
+RUN sed -i 's/plugins=(git)/plugins=(git per-directory-history z gitignore)/g' ~/.zshrc
 # Link the per-directory-history plugin to /workspace/$PROJECT_NAME/.devcontainer/persistent/.directory_history
 ARG PROJECT_NAME=$PROJECT_NAME
 RUN ln -s /workspaces/$PROJECT_NAME/.devcontainer/persistent/.directory_history ~/.directory_history
@@ -64,7 +64,7 @@ RUN apt-get update && \
     python3 \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
-RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/pypoetry python3 -
 # Add poetry to PATH for non-root user
 USER $USERNAME
 RUN echo 'export PATH="/opt/pypoetry/bin:$PATH"' >> ~/.zshrc
