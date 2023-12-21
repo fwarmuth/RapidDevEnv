@@ -1,17 +1,19 @@
 {
-  "name": "RapidDevEnv-container",
+  "name": "batch_auto_label-container",
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
       "USERNAME": "vscode",
       "USER_UID": "1000",
       "USER_GID": "1000",
-      "PROJECT_NAME": "RapidDevEnv"
+      "PROJECT_NAME": "batch_auto_label",
+      "DISTRO": "ubuntu2204",
+      "ARCH": "x86_64"
     }
   },
   "remoteUser": "vscode",
   "runArgs": [
     "--gpus=all",
-    "--hostname=RapidDevEnv-container@host"
+    "--hostname=batch_auto_label-container@felix-3900x"
   ]
 }

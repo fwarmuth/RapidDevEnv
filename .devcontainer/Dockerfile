@@ -73,6 +73,7 @@ RUN echo 'export PATH="/opt/pypoetry/bin:$PATH"' >> ~/.zshrc
 ARG DEBIAN_FRONTEND=
 
 FROM base as cuda
+USER root
 # Install CUDA Toolkit stuff
 ARG DISTRO=ubuntu2204
 ARG ARCH=x86_64
@@ -83,6 +84,7 @@ RUN sudo apt-get update && \
         && \
     sudo rm -rf /var/lib/apt/lists/*
 # Install NVIDIA Repo
+# https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
 RUN wget https://developer.download.nvidia.com/compute/cuda/repos/$DISTRO/$ARCH/cuda-keyring_1.1-1_all.deb \
     && dpkg -i cuda-keyring_1.1-1_all.deb \
     && rm cuda-keyring_1.1-1_all.deb
